@@ -18,6 +18,7 @@
             {{ session('success') }}
         </div>
     @endif
+    
 
     <!-- Search and Filters -->
     <form method="GET" action="{{ route('people.index') }}" class="mb-4 flex space-x-4">
@@ -53,15 +54,19 @@
 
         <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Filter</button>
     </form>
+    
 
-    <!-- Bulk Delete and Export -->
-    <div class="flex items-center mb-4">
-        <form method="POST" action="{{ route('people.bulkDelete') }}" id="bulkDeleteForm">
-            @csrf
-            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700" onclick="bulkDelete()">Bulk Delete</button>
-        </form>
+   <!-- Bulk Delete and Add People Data -->
+<div class="flex items-center mb-4 space-x-4">
+    <form method="POST" action="{{ route('people.bulkDelete') }}" id="bulkDeleteForm">
+        @csrf
+        <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700" onclick="bulkDelete()">Bulk Delete</button>
+    </form>
+    
+    <!-- Add People Data Button -->
+    <a href="{{ url('/add-people-data') }}" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Add People Data</a>
+</div>
 
-    </div>
 
     <!-- Table -->
     <div class="overflow-x-auto bg-white rounded-lg shadow-lg">

@@ -10,6 +10,22 @@
 <body class="bg-gray-50">
 
 <div class="max-w-7xl mx-auto p-6">
+     <!-- Navigation Section -->
+     <nav class="mb-6">
+        <ul class="flex space-x-4">
+            <li>
+                <a href="{{ url('/people-data') }}" class="text-blue-600 hover:text-blue-800 focus:outline-none">
+                    People Data
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('/data-management') }}" class="text-blue-600 hover:text-blue-800 focus:outline-none">
+                    Data Management
+                </a>
+            </li>
+            <!-- Add more navigation items here as needed -->
+        </ul>
+    </nav>
     <!-- Title -->
     <h1 class="text-5xl font-bold text-gray-900 mb-10 text-center">Data Management Dashboard</h1>
 
