@@ -9,24 +9,24 @@
 <body class="bg-gray-100 font-sans">
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="bg-gray-100 text-black py-4 ">
+        <header class="bg-gray-100 text-black py-4">
             <div class="container mx-auto flex justify-between items-center">
                 <h1 class="text-2xl font-bold"></h1>
                 <nav>
                     <ul class="flex space-x-4">
-                        
-                        <li>
+                        @auth
                             <!-- Logout Form -->
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="hover:text-gray-500 focus:outline-none">
-                                    Logout
-                                </button>
-                            </form>
-                        </li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="hover:text-gray-500 focus:outline-none">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        @endauth
                     </ul>
                 </nav>
-                
             </div>
         </header>
 
@@ -58,8 +58,6 @@
                 </div>
             </div>
         </main>
-
-       
     </div>
 </body>
 </html>

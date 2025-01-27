@@ -68,10 +68,10 @@ Route::middleware('auth')->prefix('people')->group(function() {
 
 
 });
-Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
-Route::post('/library/upload', [LibraryController::class, 'upload'])->name('library.upload');
-Route::get('/library/download/{id}', [LibraryController::class, 'download'])->name('library.download');
-Route::get('/library/view/{id}', [LibraryController::class, 'view'])->name('library.view');
-Route::get('/file-tracers', [LibraryController::class, 'tracers'])->name('file.tracers');
+Route::middleware(['auth'])->get('/library', [LibraryController::class, 'index'])->name('library.index');
+Route::middleware(['auth'])->post('/library/upload', [LibraryController::class, 'upload'])->name('library.upload');
+Route::middleware(['auth'])->get('/library/download/{id}', [LibraryController::class, 'download'])->name('library.download');
+Route::middleware(['auth'])->get('/library/view/{id}', [LibraryController::class, 'view'])->name('library.view');
+Route::middleware(['auth'])->get('/file-tracers', [LibraryController::class, 'tracers'])->name('file.tracers');
 
 require __DIR__.'/auth.php';
