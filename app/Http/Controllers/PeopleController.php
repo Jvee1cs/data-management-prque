@@ -52,45 +52,35 @@ class PeopleController extends Controller
     public function index(Request $request)
     {
         $query = People::query();
-
+    
         // Search by name
-        if ($request->has('search') && $request->get('search') !== '') {
+        if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where('first_name', 'like', "%$search%")
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%$search%")
                   ->orWhere('last_name', 'like', "%$search%");
+            });
         }
-
-        // Filter by class
-        if ($request->has('class') && $request->get('class') !== '') {
-            $query->where('class', $request->get('class'));
+    
+        // Apply filters
+        foreach (['class', 'gender', 'location', 'age'] as $filter) {
+            if ($request->filled($filter)) {
+                $query->where($filter, $request->get($filter));
+            }
         }
-
-        // Filter by gender
-        if ($request->has('gender') && $request->get('gender') !== '') {
-            $query->where('gender', $request->get('gender'));
-        }
-
-        // Filter by location
-        if ($request->has('location') && $request->get('location') !== '') {
-            $query->where('location', $request->get('location'));
-        }
-
-        // Filter by age
-        if ($request->has('age') && $request->get('age') !== '') {
-            $query->where('age', $request->get('age'));
-        }
-
-        // Get the data with pagination
-        $people = $query->paginate(10);
-
+    
+        // Get the data with pagination (preserving filters)
+        $people = $query->paginate(10)->appends($request->query());
+    
+        // Get filter options
         $classess = People::distinct()->pluck('class')->toArray();
-$genders = People::distinct()->pluck('gender')->toArray();
-$locations = People::distinct()->pluck('location')->toArray();
-$ages = People::distinct()->pluck('age')->toArray();
-
-
+        $genders = People::distinct()->pluck('gender')->toArray();
+        $locations = People::distinct()->pluck('location')->toArray();
+        $ages = People::distinct()->pluck('age')->toArray();
+    
         return view('people.index', compact('people', 'classess', 'genders', 'locations', 'ages'));
     }
+    
 
      // Show form to edit a People's data
      public function edit($id)
@@ -143,15 +133,18 @@ $ages = People::distinct()->pluck('age')->toArray();
          return redirect()->route('people.index')->with('success', 'People deleted successfully');
      }
      public function bulkDelete(Request $request)
-     {
-         $ids = $request->get('ids');
-         People::whereIn('id', $ids)->delete();
-         // Delete profile picture if exists
-         if ($ids->profile_picture) {
-            \Storage::delete('public/' . $ids->profile_picture);
-        }
- 
-         return redirect()->route('people.index')->with('success', 'People deleted successfully!');
-     }
+{
+    // Ensure that 'ids' is an array
+    $ids = explode(',', $request->input('ids')); // Convert string to array
+
+    if (count($ids) > 0) {
+        People::whereIn('id', $ids)->delete();
+        return redirect()->route('people.index')->with('success', 'Selected records deleted successfully.');
+    } else {
+        return redirect()->route('people.index')->with('error', 'No records selected.');
+    }
+}
+
+     
      
 }

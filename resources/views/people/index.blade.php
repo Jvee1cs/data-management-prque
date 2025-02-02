@@ -19,7 +19,6 @@
         </div>
     @endif
     
-
     <!-- Search and Filters -->
     <form method="GET" action="{{ route('people.index') }}" class="mb-4 flex space-x-4">
         <input type="text" name="search" placeholder="Search by name..." value="{{ request()->get('search') }}" class="px-4 py-2 border border-gray-300 rounded-md">
@@ -54,19 +53,17 @@
 
         <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Filter</button>
     </form>
-    
 
-   <!-- Bulk Delete and Add People Data -->
-<div class="flex items-center mb-4 space-x-4">
-    <form method="POST" action="{{ route('people.bulkDelete') }}" id="bulkDeleteForm">
-        @csrf
-        <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700" onclick="bulkDelete()">Bulk Delete</button>
-    </form>
-    
-    <!-- Add People Data Button -->
-    <a href="{{ url('/add-people-data') }}" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Add People Data</a>
-</div>
-
+    <!-- Bulk Delete and Add People Data -->
+    <div class="flex items-center mb-4 space-x-4">
+        <form method="POST" action="{{ route('people.bulkDelete') }}" id="bulkDeleteForm">
+            @csrf
+            <input type="hidden" name="ids" id="bulkDeleteIds">
+            <button type="button" id="bulkDeleteButton" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">Bulk Delete</button>
+        </form>
+        
+        <a href="{{ url('/add-people-data') }}" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Add People Data</a>
+    </div>
 
     <!-- Table -->
     <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
@@ -78,10 +75,10 @@
                     </th>
                     <th class="py-3 px-4 text-left">Profile Picture</th>
                     <th class="py-3 px-4 text-left">
-                        <a href="{{ route('people.index', ['sort_by' => 'first_name', 'sort_order' => request()->get('sort_order') == 'asc' ? 'desc' : 'asc']) }}" class="text-white">First Name</a>
+                        <a href="{{ route('people.index', array_merge(request()->all(), ['sort_by' => 'first_name', 'sort_order' => request()->get('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" class="text-white">First Name</a>
                     </th>
                     <th class="py-3 px-4 text-left">
-                        <a href="{{ route('people.index', ['sort_by' => 'last_name', 'sort_order' => request()->get('sort_order') == 'asc' ? 'desc' : 'asc']) }}" class="text-white">Last Name</a>
+                        <a href="{{ route('people.index', array_merge(request()->all(), ['sort_by' => 'last_name', 'sort_order' => request()->get('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" class="text-white">Last Name</a>
                     </th>
                     <th class="py-3 px-4 text-left">Gender</th>
                     <th class="py-3 px-4 text-left">Age</th>
@@ -127,67 +124,26 @@
     <div class="mt-4">
         {{ $people->links() }}
     </div>
-
-</div>
-
-<!-- Statistics Modal -->
-<div id="statisticsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h3 class="text-2xl mb-4">Statistics</h3>
-        <canvas id="genderChart" class="mb-4"></canvas>
-        <button id="closeStatistics" class="bg-gray-600 text-white px-4 py-2 rounded-md">Close</button>
-    </div>
 </div>
 
 <script>
-    // Bulk delete functionality
-    function bulkDelete() {
-        var selectedIds = [];
-        document.querySelectorAll('.person-checkbox:checked').forEach(function(checkbox) {
-            selectedIds.push(checkbox.value);
-        });
+    // Select all checkboxes
+    document.getElementById('select-all').addEventListener('click', function() {
+        let checkboxes = document.querySelectorAll('.person-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    // Bulk delete function
+    document.getElementById('bulkDeleteButton').addEventListener('click', function() {
+        let selectedIds = Array.from(document.querySelectorAll('.person-checkbox:checked')).map(cb => cb.value);
 
         if (selectedIds.length > 0) {
-            // Set selected IDs to the bulk delete form and submit
-            document.querySelector('form#bulkDeleteForm').innerHTML = '<input type="hidden" name="ids" value="' + selectedIds.join(',') + '">';
-            document.querySelector('form#bulkDeleteForm').submit();
+            document.getElementById('bulkDeleteIds').value = selectedIds.join(',');
+            document.getElementById('bulkDeleteForm').submit();
         } else {
             alert("Please select at least one person.");
         }
-    }
-
-    // Statistics modal logic
-    document.querySelectorAll('.view-statistics').forEach(function(button) {
-        button.addEventListener('click', function() {
-            // Show modal
-            document.getElementById('statisticsModal').classList.remove('hidden');
-            renderStatistics();
-        });
     });
-
-    document.getElementById('closeStatistics').addEventListener('click', function() {
-        document.getElementById('statisticsModal').classList.add('hidden');
-    });
-
-    function renderStatistics() {
-        const maleCount = {{ $people->where('gender', 'Male')->count() }};
-        const femaleCount = {{ $people->where('gender', 'Female')->count() }};
-        const totalCount = {{ $people->count() }};
-        const data = {
-            labels: ['Male', 'Female'],
-            datasets: [{
-                data: [maleCount, femaleCount],
-                backgroundColor: ['#4CAF50', '#FF5722'],
-                hoverBackgroundColor: ['#388E3C', '#D32F2F']
-            }]
-        };
-
-        var ctx = document.getElementById('genderChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: data
-        });
-    }
 </script>
 
 </body>

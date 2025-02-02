@@ -64,7 +64,8 @@ Route::middleware('auth')->prefix('people')->group(function() {
     Route::put('/{id}', [PeopleController::class, 'update'])->name('people.update');  // Update person
     Route::delete('/{id}', [PeopleController::class, 'destroy'])->name('delete-person');  // Delete person
     Route::get('/', [PeopleController::class, 'index'])->name('people.index'); // People index route
-    Route::post('/bulk-delete', [PeopleController::class, 'bulkDelete'])->name('people.bulkDelete');
+    Route::post('/people/bulk-delete', [PeopleController::class, 'bulkDelete'])->name('people.bulkDelete');
+
 
 
 });
